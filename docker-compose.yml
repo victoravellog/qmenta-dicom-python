@@ -1,0 +1,35 @@
+# full docker compose yml to run the fastapi app with mongodb
+
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi
+    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8002
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mongo
+    env_file:
+      - ./.env
+
+  mongo:
+    image: mongo:4.2.3
+    volumes:
+      - mongo-data:/data/db
+      - mongo-configdb:/data/configdb
+    ports:
+      - "27017:27017"
+
+volumes:
+  mongo-data:
+  mongo-configdb:
+
+networks:
+  default:
+    name: net_fastapi
